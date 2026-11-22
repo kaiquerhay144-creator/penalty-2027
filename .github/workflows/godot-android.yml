@@ -24,9 +24,11 @@ jobs:
       - name: Prepare Android SDK and debug keystore
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
-          mkdir -p "$HOME/.config/godot"
+          mkdir -p "$HOME/.config/godot" "$HOME/.android"
+          echo "JAVA_HOME=$JAVA_HOME"
+          ls -la "$ANDROID_HOME"
           keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" || true
-          cat > "$HOME/.config/godot/editor_settings-4.4.tres" <<EOF
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
           [gd_resource type="EditorSettings" format=3]
           [resource]
           export/android/android_sdk_path = "$ANDROID_HOME"
@@ -35,10 +37,13 @@ jobs:
           export/android/debug_keystore_user = "androiddebugkey"
           export/android/debug_keystore_pass = "android"
           EOF
+          cp "$HOME/.config/godot/editor_settings-4.tres" "$HOME/.config/godot/editor_settings-4.4.tres"
+          cat "$HOME/.config/godot/editor_settings-4.tres"
       - name: Import Godot assets
         run: godot --headless --path godot --editor --import --quit
       - name: Export Android APK
-        run: godot --headless --path godot --export-debug Android "$GITHUB_WORKSPACE/PENALTY-2027-3D.apk"
+        run: |
+          godot --headless --verbose --path godot --export-debug Android "$GITHUB_WORKSPACE/PENALTY-2027-3D.apk"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
