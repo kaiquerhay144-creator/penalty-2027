@@ -53,6 +53,16 @@ jobs:
         run: godot --headless --path godot --editor --import --quit
       - name: Export Android APK
         run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("godot/export_presets.cfg")
+          s=p.read_text()
+          s=s.replace('keystore/debug=""','keystore/debug="/home/runner/.android/debug.keystore"')
+          s=s.replace('keystore/debug_user=""','keystore/debug_user="androiddebugkey"')
+          s=s.replace('keystore/debug_password=""','keystore/debug_password="android"')
+          p.write_text(s)
+          print("Android debug signing configured; keystore exists:", Path("/home/runner/.android/debug.keystore").exists())
+          PY
           godot --headless --verbose --path godot --export-debug Android "$GITHUB_WORKSPACE/PENALTY-2027-3D.apk"
       - name: Upload APK
         uses: actions/upload-artifact@v4
