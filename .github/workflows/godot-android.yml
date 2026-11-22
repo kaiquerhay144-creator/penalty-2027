@@ -26,6 +26,13 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME"
           mkdir -p "$HOME/.config/godot" "$HOME/.android"
           echo "JAVA_HOME=$JAVA_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls -la "$ANDROID_HOME/build-tools" || true
+          ls -la "$ANDROID_HOME/platforms" || true
+          if [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          fi
           ls -la "$ANDROID_HOME"
           keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" || true
           cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
@@ -39,6 +46,9 @@ jobs:
           EOF
           cp "$HOME/.config/godot/editor_settings-4.tres" "$HOME/.config/godot/editor_settings-4.4.tres"
           cat "$HOME/.config/godot/editor_settings-4.tres"
+          test -f "$ANDROID_HOME/build-tools/35.0.0/aapt2"
+          test -f "$ANDROID_HOME/platforms/android-35/android.jar"
+          test -f "$HOME/.android/debug.keystore"
       - name: Import Godot assets
         run: godot --headless --path godot --editor --import --quit
       - name: Export Android APK
