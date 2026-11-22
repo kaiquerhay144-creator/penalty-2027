@@ -1,0 +1,3 @@
+plugins { id 'com.android.application' }
+android { namespace 'com.rhay.penalty2027'; compileSdk 35
+ defaultConfig { applicationId 'com.rhay.penalty2027'; minSdk 23; targetSdk 28; versionCode 1; versionName '0.1' } }
